@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 version = "0.1"
 
-setup(name="openstack.nose",
+setup(name="openstack.nose_plugin",
       version=version,
       description="openstack run_tests.py style output for nosetests",
       long_description=open("README.rst").read(),
