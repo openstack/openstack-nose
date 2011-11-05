@@ -45,15 +45,15 @@ class Openstack(plugins.Plugin):
 
     def _get_color(self, elapsed):
         if elapsed > self.red:
-            return 'red'
+            return "red"
         elif elapsed > self.yellow:
-            return 'yellow'
+            return "yellow"
         else:
-            return 'green'
+            return "green"
 
     def _get_name(self, test):
         address = test.address()
-        parts = address[2].split('.')
+        parts = address[2].split(".")
         if len(parts) == 2:
             return tuple(parts)
         else:
@@ -74,24 +74,39 @@ class Openstack(plugins.Plugin):
                 color = self._get_color(elapsed)
                 self.colorizer.write("  %.2f" % elapsed, color)
             self.stream.writeln()
-        else:
-            self.stream.write(short_result)
+        elif self.dots:
+            self.colorizer.write(short_result, color)
             self.stream.flush()
 
-    def addError(self, test, err):
+    # These functions are for patching into the result object
+    def _add_error(self, test, err):
         name = self._get_name(test)
         self.times[name].append(time.time())
-        self._writeResult(test, 'ERROR', 'red', 'E')
+        self._writeResult(test, "ERROR", "red", "E")
+        self._result_addError(test, err)
 
-    def addFailure(self, test, err):
+    def _add_failure(self, test, err):
         name = self._get_name(test)
         self.times[name].append(time.time())
-        self._writeResult(test, 'FAIL', 'red', 'F')
+        self._writeResult(test, "FAIL", "red", "F")
+        self._result_addFailure(test, err)
 
-    def addSuccess(self, test):
+    def _add_success(self, test):
         name = self._get_name(test)
         self.times[name].append(time.time())
-        self._writeResult(test, 'OK', 'green', '.')
+        self._writeResult(test, "OK", "green", ".")
+        self._result_addSuccess(test)
+
+    def _add_skip(self, test, reason):
+        name = self._get_name(test)
+        self.times[name].append(time.time())
+        self._writeResult(test, "SKIP", "blue", "S")
+        self._result_addSkip(test, reason)
+
+    def _print_errors(self):
+        if self.dots or self.show_all:
+            self.stream.writeln()
+        self._result_printErrors()
 
     def configure(self, options, conf):
         plugins.Plugin.configure(self, options, conf)
@@ -104,7 +119,6 @@ class Openstack(plugins.Plugin):
         self.colorizer = None
         self._cls = None
         self._slow_tests = []
-        self.show_all = True
 
     def options(self, parser, env):
         plugins.Plugin.options(self, parser, env)
@@ -133,9 +147,34 @@ class Openstack(plugins.Plugin):
                           help="Number top slowest tests to report. "
                                "[NOSE_OPENSTACK_NUM_SLOW]")
 
+    def prepareTestResult(self, result):
+        self._result = result
+        self.show_all = result.showAll
+        self.dots = result.dots
+        self.separator1 = result.separator1
+        self.separator2 = result.separator2
+        result.showAll = False
+        result.dots = False
+
+        self._result_addError = result.addError
+        result.addError = self._add_error
+
+        self._result_addFailure = result.addFailure
+        result.addFailure = self._add_failure
+
+        self._result_addSuccess = result.addSuccess
+        result.addSuccess = self._add_success
+
+        if hasattr(result, "addSkip"):
+            self._result_addSkip = result.addSkip
+            result.addSkip = self._add_skip
+
+        self._result_printErrors = result.printErrors
+        result.printErrors = self._print_errors
+
     def report(self, stream):
         slow_tests = [item for item in self._slow_tests
-                      if self._get_color(item[0]) != 'green']
+                      if self._get_color(item[0]) != "green"]
         if slow_tests:
             slow_total_time = sum(item[0] for item in slow_tests)
             stream.writeln("Slowest %i tests took %.2f secs:"
@@ -155,9 +194,10 @@ class Openstack(plugins.Plugin):
 
     def startTest(self, test):
         cls, name = self._get_name(test)
-        if cls != self._cls:
-            self.stream.writeln(str(cls))
-            self._cls = cls
-        self.stream.write((' ' * 4 + str(name)).ljust(65))
-        self.stream.flush()
+        if self.show_all:
+            if cls != self._cls:
+                self.stream.writeln(str(cls))
+                self._cls = cls
+            self.stream.write((' ' * 4 + str(name)).ljust(65))
+            self.stream.flush()
         self.times[(cls, name)] = [time.time()]
