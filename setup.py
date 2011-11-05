@@ -15,10 +15,12 @@ setup(name="openstack.nose",
       packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
       install_requires=[
           "nose",
+          "colorama",
+          "termcolor",
       ],
       entry_points="""
       # -*- Entry points: -*-
 [nose.plugins.0.10]
-openstack.nose = openstack.nose:NovaNose
+openstack.nose_plugin = openstack.nose_plugin:Openstack
       """,
       )
