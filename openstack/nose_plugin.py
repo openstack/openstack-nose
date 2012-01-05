@@ -9,6 +9,7 @@ import time
 import colorama
 import termcolor
 from nose import plugins
+from nose import suite
 
 
 log = logging.getLogger("openstack.nose")
@@ -195,6 +196,9 @@ class Openstack(plugins.Plugin):
         self.stream.writeln()
 
     def startTest(self, test):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         cls, name = self._get_name(test)
         if self.show_all:
             if cls != self._cls:
