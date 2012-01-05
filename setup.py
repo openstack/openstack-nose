@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = "0.2"
+version = "0.3"
 
 setup(name="openstack.nose_plugin",
       version=version,
