@@ -63,6 +63,9 @@ class Openstack(plugins.Plugin):
             return None, parts[0]
 
     def _writeResult(self, test, long_result, color, short_result):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         name = self._get_name(test)
         elapsed = self.times[name][1] - self.times[name][0]
         item = (elapsed, name)
@@ -83,24 +86,36 @@ class Openstack(plugins.Plugin):
 
     # These functions are for patching into the result object
     def _add_error(self, test, err):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         name = self._get_name(test)
         self.times[name].append(time.time())
         self._writeResult(test, "ERROR", "red", "E")
         self._result_addError(test, err)
 
     def _add_failure(self, test, err):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         name = self._get_name(test)
         self.times[name].append(time.time())
         self._writeResult(test, "FAIL", "red", "F")
         self._result_addFailure(test, err)
 
     def _add_success(self, test):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         name = self._get_name(test)
         self.times[name].append(time.time())
         self._writeResult(test, "OK", "green", ".")
         self._result_addSuccess(test)
 
     def _add_skip(self, test, reason):
+        if isinstance(test, suite.ContextSuite):
+            return
+
         name = self._get_name(test)
         self.times[name].append(time.time())
         self._writeResult(test, "SKIP", "blue", "S")
