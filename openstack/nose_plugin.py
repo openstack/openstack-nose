@@ -159,6 +159,10 @@ class Openstack(plugins.Plugin):
                           default=env.get("NOSE_OPENSTACK_COLOR"),
                           dest="openstack_color",
                           help="Colorize output. [NOSE_OPENSTACK_COLOR]")
+        parser.add_option("--openstack-nocolor", action="store_false",
+                          default=env.get("NOSE_OPENSTACK_COLOR"),
+                          dest="openstack_color",
+                          help="Disable colorized output. [NOSE_OPENSTACK_COLOR]")
         parser.add_option("--openstack-num-slow",
                           dest="openstack_num_slow",
                           default=env.get("NOSE_OPENSTACK_NUM_SLOW", 5),
