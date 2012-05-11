@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
-version = "0.5"
+version = "0.6"
 
 setup(name="openstack.nose_plugin",
       version=version,
       description="openstack run_tests.py style output for nosetests",
       long_description=open("README.rst").read(),
-      classifiers=[],  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[],
       keywords="nose",
       author="Jason K\xc3\xb6lker",
       author_email="jason@koelker.net",

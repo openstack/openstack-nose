@@ -26,6 +26,7 @@ The following options are availible:
                           Show the elaped runtime of tests.
                           [NOSE_OPENSTACK_SHOW_ELAPSED]
     --openstack-color     Colorize output. [NOSE_OPENSTACK_COLOR]
+    --openstack-nocolor   Disable colorize output. [NOSE_OPENSTACK_COLOR]
     --openstack-num-slow=OPENSTACK_NUM_SLOW
                           Number top slowest tests to report.
                           [NOSE_OPENSTACK_NUM_SLOW]
