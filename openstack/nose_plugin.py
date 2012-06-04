@@ -4,12 +4,14 @@ Openstack run_tests.py style output for nosetests
 
 import heapq
 import logging
+import sys
 import time
 
 import colorama
 import termcolor
 from nose import plugins
 from nose import suite
+from nose import core
 
 
 log = logging.getLogger("openstack.nose")
@@ -134,6 +136,7 @@ class Openstack(plugins.Plugin):
         self.show_elapsed = options.openstack_show_elapsed
         self.num_slow = int(options.openstack_num_slow)
         self.color = options.openstack_color
+        self.use_stdout = options.openstack_stdout
         self.colorizer = None
         self._cls = None
         self._slow_tests = []
@@ -169,6 +172,21 @@ class Openstack(plugins.Plugin):
                           default=env.get("NOSE_OPENSTACK_NUM_SLOW", 5),
                           help="Number top slowest tests to report. "
                                "[NOSE_OPENSTACK_NUM_SLOW]")
+        parser.add_option("--openstack-stdout", action="store_true",
+                          default=env.get("NOSE_OPENSTACK_STDOUT"),
+                          dest="openstack_stdout",
+                          help="Output to stdout. [NOSE_OPENSTACK_STDOUT]")
+
+    def prepareTestRunner(self, runner):
+        if (not isinstance(runner, core.TextTestRunner) or
+            not self.use_stdout):
+            return
+
+        new_runner = core.TextTestRunner(stream=sys.__stdout__,
+                                         descriptions=runner.descriptions,
+                                         verbosity=runner.verbosity,
+                                         config=runner.config)
+        return new_runner
 
     def prepareTestResult(self, result):
         self._result = result
