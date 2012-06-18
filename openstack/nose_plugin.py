@@ -12,6 +12,7 @@ import termcolor
 from nose import plugins
 from nose import suite
 from nose import core
+from nose import SkipTest
 
 
 log = logging.getLogger("openstack.nose")
@@ -90,6 +91,8 @@ class Openstack(plugins.Plugin):
     def _add_error(self, test, err):
         if isinstance(test, suite.ContextSuite):
             return
+        if isinstance(err[1], SkipTest):
+            return self._add_skip(test, err)
 
         name = self._get_name(test)
         self.times[name].append(time.time())
