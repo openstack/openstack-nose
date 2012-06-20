@@ -4,6 +4,7 @@ Openstack run_tests.py style output for nosetests
 
 import heapq
 import logging
+import os
 import sys
 import time
 
@@ -132,6 +133,9 @@ class Openstack(plugins.Plugin):
             self.stream.writeln()
         self._result_printErrors()
 
+    def _is_a_tty(self):
+        return getattr(os, 'isatty') and os.isatty(sys.stdout.fileno())
+
     def configure(self, options, conf):
         plugins.Plugin.configure(self, options, conf)
         self.conf = conf
@@ -231,7 +235,7 @@ class Openstack(plugins.Plugin):
 
     def setOutputStream(self, stream):
         self.stream = stream
-        if self.color:
+        if self.color and self._is_a_tty:
             self.colorizer = Colorizer(self.stream)
         else:
             self.colorizer = NullColorizer(self.stream)
