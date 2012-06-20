@@ -65,7 +65,8 @@ class Openstack(plugins.Plugin):
         else:
             return None, parts[0]
 
-    def _writeResult(self, test, long_result, color, short_result):
+    def _writeResult(self, test, long_result, color, short_result,
+                     show_elapsed=True):
         if isinstance(test, suite.ContextSuite):
             return
 
@@ -79,7 +80,7 @@ class Openstack(plugins.Plugin):
 
         if self.show_all:
             self.colorizer.write(long_result, color)
-            if self.show_elapsed:
+            if self.show_elapsed and show_elapsed:
                 color = self._get_color(elapsed)
                 self.colorizer.write("  %.2f" % elapsed, color)
             self.stream.writeln()
@@ -123,7 +124,7 @@ class Openstack(plugins.Plugin):
 
         name = self._get_name(test)
         self.times[name].append(time.time())
-        self._writeResult(test, "SKIP", "blue", "S")
+        self._writeResult(test, "SKIP", "blue", "S", show_elapsed=False)
         self._result_addSkip(test, reason)
 
     def _print_errors(self):
