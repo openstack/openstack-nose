@@ -115,7 +115,7 @@ class Openstack(plugins.Plugin):
 
         name = self._get_name(test)
         self.times[name].append(time.time())
-        self._writeResult(test, "OK", "green", ".")
+        self._writeResult(test, "OK  ", "green", ".")
         self._result_addSuccess(test)
 
     def _add_skip(self, test, reason):
