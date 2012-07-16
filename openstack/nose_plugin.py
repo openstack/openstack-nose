@@ -229,7 +229,7 @@ class Openstack(plugins.Plugin):
             stream.writeln("Slowest %i tests took %.2f secs:"
                                 % (len(slow_tests), slow_total_time))
             for time, test in sorted(slow_tests, reverse=True):
-                name = '.'.join(test)
+                name = '.'.join([str(i) for i in test])
                 self.colorizer.writeln("    %.2f    %s" % (time, name),
                                        self._get_color(time))
 
