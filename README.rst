@@ -11,7 +11,7 @@ Installation
 Usage
 -----
 
-The following options are availible:
+The following options are available:
 
     --with-openstack      Enable plugin Openstack: Nova style output
                           generator
