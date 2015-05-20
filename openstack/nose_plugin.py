@@ -250,6 +250,6 @@ class Openstack(plugins.Plugin):
             if cls != self._cls:
                 self.stream.writeln(str(cls))
                 self._cls = cls
-            self.stream.write((' ' * 4 + str(name)).ljust(65))
+            self.stream.write('    {0}'.format(name).ljust(65))
             self.stream.flush()
         self.times[(cls, name)] = [time.time()]
